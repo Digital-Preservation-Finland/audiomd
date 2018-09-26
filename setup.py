@@ -2,8 +2,8 @@
 Install audiomd
 """
 
-import os
 from setuptools import setup, find_packages
+from version import get_version
 
 
 def main():
@@ -11,7 +11,8 @@ def main():
     setup(
         name='audiomd',
         packages=find_packages(exclude=['tests', 'tests.*']),
-        version='0.1')
+        version=get_version()
+    )
 
 
 if __name__ == '__main__':
