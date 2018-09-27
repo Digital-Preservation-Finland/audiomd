@@ -1,50 +1,65 @@
-import audiomd.audiomd as amd
-import pytest
-import os
+"""Unit tests for creation of AudioMD metadata.
+"""
 
-NAMESPACES = {'amd': amd.AudioMD_NS}
+import audiomd.audiomd as amd
+
+NAMESPACES = {'amd': amd.AUDIOMD_NS}
 
 
 def test_audiomd_ok():
+    """Test that audiomd() functions returns the root XML elements with
+    correct metadata.
+    """
 
-    compression = amd.amd_compression(codecCreatorApp='SoundForge',
-                                      codecCreatorAppVersion='10',
-                                      codecName='(:unap)',
-                                      codecQuality='lossy')
+    compression = amd.amd_compression(app='SoundForge',
+                                      app_version='10',
+                                      name='(:unap)',
+                                      quality='lossy')
 
-    file_data = amd.amd_fileData(audioDataEncoding=['PCM'],
-                                 bitsPerSample=['8'],
-                                 Compression=[compression],
-                                 dataRate=['256'],
-                                 dataRateMode=['Fixed'],
-                                 samplingFrequency=['44.1'])
+    params = amd.get_params(amd.FILE_DATA_PARAMS)
+    params["audioDataEncoding"] = ["PCM"]
+    params["bitsPerSample"] = ["8"]
+    params["Compression"] = [compression]
+    params["dataRate"] = ["256"]
+    params["dataRateMode"] = ["Fixed"]
+    params["samplingFrequency"] = ["44.1"]
 
-    audio_info = amd.amd_audioInfo(duration=['PT1H30M'],
-                                   numChannels=['1'])
+    file_data = amd.amd_file_data(params)
+    audio_info = amd.amd_audio_info(duration=['PT1H30M'], num_channels=['1'])
+    audiomd = amd.audiomd(file_data=file_data, audio_info=audio_info)
 
-    audiomd = amd.audiomd(fileData=file_data, audioInfo=audio_info)
+    path = "/amd:amd[@ANALOGDIGITALFLAG='FileDigital']"
+    assert len(audiomd.xpath(path, namespaces=NAMESPACES)) == 1
 
-    assert len(audiomd.xpath(
-        "/amd:amd[@ANALOGDIGITALFLAG='FileDigital']", namespaces=NAMESPACES)) == 1
-    assert audiomd.xpath("/amd:amd/amd:fileData/amd:audioDataEncoding",
-                         namespaces=NAMESPACES)[0].text == 'PCM'
-    assert audiomd.xpath("/amd:amd/amd:fileData/amd:bitsPerSample",
-                         namespaces=NAMESPACES)[0].text == '8'
-    assert audiomd.xpath("/amd:amd/amd:fileData/amd:compression/amd:codecCreatorApp",
-                         namespaces=NAMESPACES)[0].text == 'SoundForge'
-    assert audiomd.xpath("/amd:amd/amd:fileData/amd:compression/amd:codecCreatorAppVersion",
-                         namespaces=NAMESPACES)[0].text == '10'
-    assert audiomd.xpath("/amd:amd/amd:fileData/amd:compression/amd:codecName",
-                         namespaces=NAMESPACES)[0].text == '(:unap)'
-    assert audiomd.xpath("/amd:amd/amd:fileData/amd:compression/amd:codecQuality",
-                         namespaces=NAMESPACES)[0].text == 'lossy'
-    assert audiomd.xpath("/amd:amd/amd:fileData/amd:dataRate",
-                         namespaces=NAMESPACES)[0].text == '256'
-    assert audiomd.xpath("/amd:amd/amd:fileData/amd:dataRateMode",
-                         namespaces=NAMESPACES)[0].text == 'Fixed'
-    assert audiomd.xpath("/amd:amd/amd:fileData/amd:samplingFrequency",
-                         namespaces=NAMESPACES)[0].text == '44.1'
-    assert audiomd.xpath("/amd:amd/amd:audioInfo/amd:duration",
-                         namespaces=NAMESPACES)[0].text == 'PT1H30M'
-    assert audiomd.xpath("/amd:amd/amd:audioInfo/amd:numChannels",
-                         namespaces=NAMESPACES)[0].text == '1'
+    path = "/amd:amd/amd:fileData/amd:audioDataEncoding"
+    assert audiomd.xpath(path, namespaces=NAMESPACES)[0].text == 'PCM'
+
+    path = "/amd:amd/amd:fileData/amd:bitsPerSample"
+    assert audiomd.xpath(path, namespaces=NAMESPACES)[0].text == '8'
+
+    path = "/amd:amd/amd:fileData/amd:compression/amd:codecCreatorApp"
+    assert audiomd.xpath(path, namespaces=NAMESPACES)[0].text == 'SoundForge'
+
+    path = "/amd:amd/amd:fileData/amd:compression/amd:codecCreatorAppVersion"
+    assert audiomd.xpath(path, namespaces=NAMESPACES)[0].text == '10'
+
+    path = "/amd:amd/amd:fileData/amd:compression/amd:codecName"
+    assert audiomd.xpath(path, namespaces=NAMESPACES)[0].text == '(:unap)'
+
+    path = "/amd:amd/amd:fileData/amd:compression/amd:codecQuality"
+    assert audiomd.xpath(path, namespaces=NAMESPACES)[0].text == 'lossy'
+
+    path = "/amd:amd/amd:fileData/amd:dataRate"
+    assert audiomd.xpath(path, namespaces=NAMESPACES)[0].text == '256'
+
+    path = "/amd:amd/amd:fileData/amd:dataRateMode"
+    assert audiomd.xpath(path, namespaces=NAMESPACES)[0].text == 'Fixed'
+
+    path = "/amd:amd/amd:fileData/amd:samplingFrequency"
+    assert audiomd.xpath(path, namespaces=NAMESPACES)[0].text == '44.1'
+
+    path = "/amd:amd/amd:audioInfo/amd:duration"
+    assert audiomd.xpath(path, namespaces=NAMESPACES)[0].text == 'PT1H30M'
+
+    path = "/amd:amd/amd:audioInfo/amd:numChannels"
+    assert audiomd.xpath(path, namespaces=NAMESPACES)[0].text == '1'
