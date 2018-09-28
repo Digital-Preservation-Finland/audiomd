@@ -1,12 +1,13 @@
 """Unit tests for creation of AudioMD metadata.
 """
 
+import pytest
 import audiomd.audiomd as amd
 
 NAMESPACES = {'amd': amd.AUDIOMD_NS}
 
 
-def test_audiomd_ok():
+def test_audiomd():
     """Test that audiomd() functions returns the root XML elements with
     correct metadata.
     """
@@ -63,3 +64,83 @@ def test_audiomd_ok():
 
     path = "/amd:amd/amd:audioInfo/amd:numChannels"
     assert audiomd.xpath(path, namespaces=NAMESPACES)[0].text == '1'
+
+
+def test_audiomd_param_fail():
+    """Test that ValueError is raised if any of the provided
+    parameters is not recognized.
+    """
+
+    params = {"typo" : None}
+
+    with pytest.raises(ValueError):
+        amd.amd_file_data(params)
+
+    with pytest.raises(ValueError):
+        amd.amd_physical_data(params)
+
+    with pytest.raises(ValueError):
+        amd.amd_dimensions(params)
+
+    with pytest.raises(ValueError):
+        amd.amd_material(params)
+
+
+def test_file_data():
+    """Test that amd_file_data() produces correct XML element
+    """
+    pass
+
+
+def test_message_digest():
+    """Test that amd_message_digest() produces correct XML element
+    """
+    pass
+
+
+def test_compression():
+    """Test that amd_compression() produces correct XML element
+    """
+    pass
+
+
+def test_physical_data():
+    """Test that amd_physical_data() produces correct XML element
+    """
+    pass
+
+
+def test_dimensions():
+    """Test that amd_dimensions() produces correct XML element
+    """
+    pass
+
+
+def test_material():
+    """Test that amd_material() produces correct XML element
+    """
+    pass
+
+
+def test_tracking():
+    """Test that amd_tracking() produces correct XML element
+    """
+    pass
+
+
+def test_audio_info():
+    """Test that amd_audio_info() produces correct XML element
+    """
+    pass
+
+
+def test_sound_channel_map():
+    """Test that amd_sound_channel_map() produces correct XML element
+    """
+    pass
+
+
+def test_calibration_info():
+    """Test that amd_calibration_info() produces correct XML element
+    """
+    pass

@@ -116,6 +116,29 @@ def _add_elements(parent, elements):
             parent.append(element)
 
 
+def get_params(param_list):
+    """Initialize all parameters as None
+
+    :returns: Dict of parameters
+    """
+
+    params = {}
+    for key in param_list:
+        params[key] = None
+
+    return params
+
+
+def _check_params(param_dict, param_list):
+    """Check that all the provided parameters in param_dict
+    are found in the param_list.
+    """
+
+    for key in param_dict:
+        if key not in param_list:
+            raise ValueError("Parameter: '%s' not recognized" % key)
+
+
 def audiomd(analog_digital_flag='FileDigital', file_data=None,
             physical_data=None, audio_info=None, calibration_info=None):
     """Create audioMD Data Dictionary root element.
@@ -146,19 +169,6 @@ def audiomd(analog_digital_flag='FileDigital', file_data=None,
         audiomd_elem.append(calibration_info)
 
     return audiomd_elem
-
-
-def get_params(param_list):
-    """Initialize all parameters as None
-
-    :returns: Dict of parameters
-    """
-
-    params = {}
-    for key in param_list:
-        params[key] = None
-
-    return params
 
 
 def amd_file_data(params):
@@ -193,6 +203,7 @@ def amd_file_data(params):
         </amd:fileData>
 
     """
+    _check_params(params, FILE_DATA_PARAMS)
 
     element = _element('fileData')
 
@@ -285,6 +296,7 @@ def amd_physical_data(params):
         </amd:physicalData>
 
     """
+    _check_params(params, PHYSICAL_DATA_PARAMS)
 
     physical_data_elem = _element('physicalData')
 
@@ -309,6 +321,7 @@ def amd_dimensions(params):
         </amd:dimensions>
 
     """
+    _check_params(params, DIMENSIONS_PARAMS)
 
     dimensions_elem = _element('dimensions')
 
@@ -338,6 +351,7 @@ def amd_material(params):
             <amd:usedSides></amd:usedSides>
         </amd:material>
     """
+    _check_params(params, MATERIAL_PARAMS)
 
     material_elem = _element('material')
 
