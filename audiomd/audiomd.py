@@ -358,7 +358,7 @@ def amd_material(params):
     for key in params:
         _one_simple_element(material_elem, params[key], key)
 
-    return amd_material
+    return material_elem
 
 
 def amd_tracking(tracking_type=None, tracking_value=None):

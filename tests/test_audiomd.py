@@ -7,6 +7,10 @@ import audiomd.audiomd as amd
 NAMESPACES = {'amd': amd.AUDIOMD_NS}
 
 
+def _get_elems(root, path):
+    return root.xpath(path, namespaces=NAMESPACES)
+
+
 def test_audiomd():
     """Test that audiomd() functions returns the root XML elements with
     correct metadata.
@@ -86,61 +90,118 @@ def test_audiomd_param_fail():
         amd.amd_material(params)
 
 
-def test_file_data():
-    """Test that amd_file_data() produces correct XML element
-    """
-    pass
-
-
 def test_message_digest():
     """Test that amd_message_digest() produces correct XML element
     """
-    pass
+    root = amd.amd_message_digest("datetime", "algorithm", "message")
+
+    path = "/amd:messageDigest/amd:messageDigest"
+
+    message = _get_elems(root, path)[0].text
+    datetime = _get_elems(root, path + "Datetime")[0].text
+    algorithm = _get_elems(root, path + "Algorithm")[0].text
+
+    assert message == "message"
+    assert datetime == "datetime"
+    assert algorithm == "algorithm"
 
 
 def test_compression():
     """Test that amd_compression() produces correct XML element
     """
-    pass
+    root = amd.amd_compression("app", "app_version", "name", "quality")
+
+    path = "/amd:compression/amd:codec"
+
+    app = _get_elems(root, path + "CreatorApp")[0].text
+    app_version = _get_elems(root, path + "CreatorAppVersion")[0].text
+    name = _get_elems(root, path + "Name")[0].text
+    quality = _get_elems(root, path + "Quality")[0].text
+
+    assert app == "app"
+    assert app_version == "app_version"
+    assert name == "name"
+    assert quality == "quality"
 
 
 def test_physical_data():
     """Test that amd_physical_data() produces correct XML element
     """
-    pass
+    params = amd.get_params(amd.PHYSICAL_DATA_PARAMS)
+    params["condition"] = ["condition"]
+    params["disposition"] = ["disposition"]
+
+    root = amd.amd_physical_data(params)
+
+    path = "/amd:physicalData/amd:"
+
+    condition = _get_elems(root, path + "condition")[0].text
+    disposition = _get_elems(root, path + "disposition")[0].text
+
+    assert condition == "condition"
+    assert disposition == "disposition"
 
 
 def test_dimensions():
     """Test that amd_dimensions() produces correct XML element
     """
-    pass
+    params = {"DEPTH" : "DEPTH", "DIAMETER" : "DIAMETER"}
+
+    root = amd.amd_dimensions(params)
+
+    assert root.get("DEPTH") == "DEPTH"
+    assert root.get("DIAMETER") == "DIAMETER"
 
 
 def test_material():
     """Test that amd_material() produces correct XML element
     """
-    pass
+    params = amd.get_params(amd.MATERIAL_PARAMS)
+    params["baseMaterial"] = "baseMaterial"
+    params["binder"] = "binder"
+
+    root = amd.amd_material(params)
+
+    path = "/amd:material/amd:"
+
+    base_material = _get_elems(root, path + "baseMaterial")[0].text
+    binder = _get_elems(root, path + "binder")[0].text
+
+    assert base_material == "baseMaterial"
+    assert binder == "binder"
 
 
 def test_tracking():
     """Test that amd_tracking() produces correct XML element
     """
-    pass
+    root = amd.amd_tracking("trackingType", "trackingValue")
+    path = "/amd:tracking/amd:tracking"
 
+    tracking_type = _get_elems(root, path + "Type")[0].text
+    tracking_value = _get_elems(root, path + "Value")[0].text
 
-def test_audio_info():
-    """Test that amd_audio_info() produces correct XML element
-    """
-    pass
+    assert tracking_type == "trackingType"
+    assert tracking_value == "trackingValue"
 
 
 def test_sound_channel_map():
     """Test that amd_sound_channel_map() produces correct XML element
     """
-    pass
+    root = amd.amd_sound_channel_map("CHANNELNUM", "MAPLOCATION")
+    assignment = root[0]
+
+    assert assignment.get("CHANNELNUM") == "CHANNELNUM"
+    assert assignment.get("MAPLOCATION") == "MAPLOCATION"
 
 
 def test_calibration_info():
     """Test that amd_calibration_info() produces correct XML element
     """
-    pass
+    root = amd.amd_calibration_info("ExtInt", "Location")
+    path = "/amd:calibrationInfo/amd:calibration"
+
+    ext_int = _get_elems(root, path + "ExtInt")[0].text
+    location = _get_elems(root, path + "Location")[0].text
+
+    assert ext_int == "ExtInt"
+    assert location == "Location"
