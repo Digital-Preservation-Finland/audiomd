@@ -97,23 +97,26 @@ def _subelement(parent, tag, prefix=""):
     return ET.SubElement(parent, audiomd_ns(tag, prefix))
 
 
-def _one_simple_element(parent, element, element_name):
-    if element is not None:
-        amd_element = _subelement(parent, element_name)
-        amd_element.text = element
-
-
 def _simple_elements(parent, elements, element_name):
     if elements is not None:
-        for element in elements:
+
+        if isinstance(elements, list):
+            for element in elements:
+                amd_element = _subelement(parent, element_name)
+                amd_element.text = element
+        else:
             amd_element = _subelement(parent, element_name)
-            amd_element.text = element
+            amd_element.text = elements
 
 
 def _add_elements(parent, elements):
     if elements is not None:
-        for element in elements:
-            parent.append(element)
+
+        if isinstance(elements, list):
+            for element in elements:
+                parent.append(element)
+        else:
+            parent.append(elements)
 
 
 def get_params(param_list):
@@ -261,10 +264,10 @@ def amd_compression(app=None, app_version=None, name=None, quality=None):
     """
     compression_elem = _element('compression')
 
-    _one_simple_element(compression_elem, app, 'codecCreatorApp')
-    _one_simple_element(compression_elem, app_version, 'codecCreatorAppVersion')
-    _one_simple_element(compression_elem, name, 'codecName')
-    _one_simple_element(compression_elem, quality, 'codecQuality')
+    _simple_elements(compression_elem, app, 'codecCreatorApp')
+    _simple_elements(compression_elem, app_version, 'codecCreatorAppVersion')
+    _simple_elements(compression_elem, name, 'codecName')
+    _simple_elements(compression_elem, quality, 'codecQuality')
 
     return compression_elem
 
@@ -356,7 +359,7 @@ def amd_material(params):
     material_elem = _element('material')
 
     for key in params:
-        _one_simple_element(material_elem, params[key], key)
+        _simple_elements(material_elem, params[key], key)
 
     return material_elem
 
@@ -376,8 +379,8 @@ def amd_tracking(tracking_type=None, tracking_value=None):
     """
     tracking_elem = _element('tracking')
 
-    _one_simple_element(tracking_elem, tracking_type, 'trackingType')
-    _one_simple_element(tracking_elem, tracking_value, 'trackingValue')
+    _simple_elements(tracking_elem, tracking_type, 'trackingType')
+    _simple_elements(tracking_elem, tracking_value, 'trackingValue')
 
     return tracking_elem
 
@@ -460,9 +463,9 @@ def amd_calibration_info(
 
     calibration_info_elem = _element('calibrationInfo')
 
-    _one_simple_element(calibration_info_elem, ext_int, 'calibrationExtInt')
-    _one_simple_element(calibration_info_elem, location, 'calibrationLocation')
+    _simple_elements(calibration_info_elem, ext_int, 'calibrationExtInt')
+    _simple_elements(calibration_info_elem, location, 'calibrationLocation')
     _simple_elements(calibration_info_elem, time_stamp, 'calibrationTimeStamp')
-    _one_simple_element(calibration_info_elem, track_type, 'calibrationTrackType')
+    _simple_elements(calibration_info_elem, track_type, 'calibrationTrackType')
 
     return calibration_info_elem

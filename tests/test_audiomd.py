@@ -22,12 +22,12 @@ def test_audiomd():
                                       quality='lossy')
 
     params = amd.get_params(amd.FILE_DATA_PARAMS)
-    params["audioDataEncoding"] = ["PCM"]
-    params["bitsPerSample"] = ["8"]
-    params["Compression"] = [compression]
-    params["dataRate"] = ["256"]
-    params["dataRateMode"] = ["Fixed"]
-    params["samplingFrequency"] = ["44.1"]
+    params["audioDataEncoding"] = "PCM"
+    params["bitsPerSample"] = "8"
+    params["Compression"] = compression
+    params["dataRate"] = "256"
+    params["dataRateMode"] = "Fixed"
+    params["samplingFrequency"] = "44.1"
 
     file_data = amd.amd_file_data(params)
     audio_info = amd.amd_audio_info(duration=['PT1H30M'], num_channels=['1'])
@@ -128,8 +128,8 @@ def test_physical_data():
     """Test that amd_physical_data() produces correct XML element
     """
     params = amd.get_params(amd.PHYSICAL_DATA_PARAMS)
-    params["condition"] = ["condition"]
-    params["disposition"] = ["disposition"]
+    params["condition"] = "condition"
+    params["disposition"] = "disposition"
 
     root = amd.amd_physical_data(params)
 
