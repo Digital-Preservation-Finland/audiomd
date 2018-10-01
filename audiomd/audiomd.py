@@ -4,7 +4,7 @@ xml.etree.ElementTree data structures.
 References:
 
     * AudioMD https://www.loc.gov/standards/amdvmd/
-    * Schema documentation: https://www.loc.gov/standards/amdvmd/htmldoc/audioMD.html 
+    * Schema documentation: https://www.loc.gov/standards/amdvmd/htmldoc/audioMD.html
     * ElementTree
     https://docs.python.org/2.6/library/xml.etree.elementtree.html
 
@@ -12,10 +12,43 @@ References:
 
 
 import lxml.etree as ET
-from xml_helpers.utils import xsi_ns, XSI_NS
+from xml_helpers.utils import xsi_ns
 
 
-AudioMD_NS = 'http://www.loc.gov/audioMD/'
+AUDIOMD_NS = 'http://www.loc.gov/audioMD/'
+
+FILE_DATA_PARAMS = [
+    "audioBlockSize", "audioDataEncoding", "bitsPerSample",
+    "byteOrder", "messageDigest", "Compression",
+    "dataRate", "dataRateMode", "firstSampleOffset",
+    "firstValidByteBlock", "formatLocation", "formatName",
+    "formatNote", "formatVersion", "lastValidByteBlock",
+    "numSampleFrames", "samplingFrequency", "security",
+    "use", "otherUse", "wordSize"
+]
+
+
+PHYSICAL_DATA_PARAMS = [
+    "EBUStorageMediaCodes", "condition", "dimensions",
+    "disposition", "equalization", "generation",
+    "groove", "material", "noiseReduction",
+    "physFormat", "speed", "speedAdjustment",
+    "speedNote", "trackFormat", "tracking",
+    "note"
+]
+
+
+DIMENSIONS_PARAMS = [
+    "DEPTH", "DIAMETER", "GAUGE",
+    "HEIGHT", "LENGTH", "NOTE",
+    "THICKNESS", "UNITS", "WIDTH"
+]
+
+MATERIAL_PARAMS = [
+    "baseMaterial", "binder", "discSurface",
+    "oxide", "activeLayer", "reflectiveLayer",
+    "stockBrand", "method", "usedSides"
+]
 
 
 def audiomd_ns(tag, prefix=""):
@@ -29,8 +62,8 @@ def audiomd_ns(tag, prefix=""):
     """
     if prefix:
         tag = tag[0].upper() + tag[1:]
-        return '{%s}%s%s' % (AudioMD_NS, prefix, tag)
-    return '{%s}%s' % (AudioMD_NS, tag)
+        return '{%s}%s%s' % (AUDIOMD_NS, prefix, tag)
+    return '{%s}%s' % (AUDIOMD_NS, tag)
 
 
 def _element(tag, prefix=""):
@@ -64,27 +97,53 @@ def _subelement(parent, tag, prefix=""):
     return ET.SubElement(parent, audiomd_ns(tag, prefix))
 
 
-def _one_simple_element(parent, element, element_name):
-    if element:
-        amd_element = _subelement(parent, element_name)
-        amd_element.text = element
-
-
 def _simple_elements(parent, elements, element_name):
-    if elements:
-        for element in elements:
+    if elements is not None:
+
+        if isinstance(elements, list):
+            for element in elements:
+                amd_element = _subelement(parent, element_name)
+                amd_element.text = element
+        else:
             amd_element = _subelement(parent, element_name)
-            amd_element.text = element
+            amd_element.text = elements
 
 
 def _add_elements(parent, elements):
-    if elements:
-        for element in elements:
-            parent.append(element)
+    if elements is not None:
+
+        if isinstance(elements, list):
+            for element in elements:
+                parent.append(element)
+        else:
+            parent.append(elements)
 
 
-def audiomd(ANALOGDIGITALFLAG='FileDigital', fileData=None,
-            physicalData=None, audioInfo=None, calibrationInfo=None):
+def get_params(param_list):
+    """Initialize all parameters as None
+
+    :returns: Dict of parameters
+    """
+
+    params = {}
+    for key in param_list:
+        params[key] = None
+
+    return params
+
+
+def _check_params(param_dict, param_list):
+    """Check that all the provided parameters in param_dict
+    are found in the param_list.
+    """
+
+    for key in param_dict:
+        if key not in param_list:
+            raise ValueError("Parameter: '%s' not recognized" % key)
+
+
+def create_audiomd(analog_digital_flag='FileDigital', file_data=None,
+                   physical_data=None, audio_info=None, calibration_info=None):
     """Create audioMD Data Dictionary root element.
 
     :Schema documentation: https://www.loc.gov/standards/amdvmd/audiovideoMDschemas.html
@@ -99,36 +158,23 @@ def audiomd(ANALOGDIGITALFLAG='FileDigital', fileData=None,
             xsi:schemalocation="http://www.loc.gov/audioMD/"
 
     """
-    audiomd = _element('amd')
-    audiomd.set(
-        xsi_ns('schemaLocation'),
-        'http://www.loc.gov/audioMD/')
-    audiomd.set('ANALOGDIGITALFLAG', ANALOGDIGITALFLAG)
+    audiomd_elem = _element('amd')
+    audiomd_elem.set(xsi_ns('schemaLocation'), 'http://www.loc.gov/audioMD/')
+    audiomd_elem.set('ANALOGDIGITALFLAG', analog_digital_flag)
 
-    if fileData:
-        audiomd.append(fileData)
-    if physicalData:
-        audiomd.append(physicalData)
-    if audioInfo:
-        audiomd.append(audioInfo)
-    if calibrationInfo:
-        audiomd.append(calibrationInfo)
+    if file_data is not None:
+        audiomd_elem.append(file_data)
+    if physical_data is not None:
+        audiomd_elem.append(physical_data)
+    if audio_info is not None:
+        audiomd_elem.append(audio_info)
+    if calibration_info is not None:
+        audiomd_elem.append(calibration_info)
 
-    return audiomd
+    return audiomd_elem
 
 
-def amd_fileData(
-        audioBlockSize=None, audioDataEncoding=None,
-        bitsPerSample=None, byteOrder=None,
-        messageDigest=None, Compression=None,
-        dataRate=None, dataRateMode=None,
-        firstSampleOffset=None, firstValidByteBlock=None,
-        formatLocation=None, formatName=None,
-        formatNote=None, formatVersion=None,
-        lastValidByteBlock=None, numSampleFrames=None,
-        samplingFrequency=None, security=None,
-        use=None, otherUse=None,
-        wordSize=None):
+def amd_file_data(params):
     """Returns AudioMD fileData element
 
     :Schema documentation: https://www.loc.gov/standards/amdvmd/audiovideoMDschemas.html
@@ -160,37 +206,20 @@ def amd_fileData(
         </amd:fileData>
 
     """
+    _check_params(params, FILE_DATA_PARAMS)
 
-    amd_fileData = _element('fileData')
+    element = _element('fileData')
 
-    _simple_elements(amd_fileData, audioBlockSize, 'audioBlockSize')
-    _simple_elements(amd_fileData, audioDataEncoding, 'audioDataEncoding')
-    _simple_elements(amd_fileData, bitsPerSample, 'bitsPerSample')
-    _simple_elements(amd_fileData, byteOrder, 'byteOrder')
-    _add_elements(amd_fileData, messageDigest)
-    _add_elements(amd_fileData, Compression)
-    _simple_elements(amd_fileData, dataRate, 'dataRate')
-    _simple_elements(amd_fileData, dataRateMode, 'dataRateMode')
-    _simple_elements(amd_fileData, firstSampleOffset, 'firstSampleOffset')
-    _simple_elements(amd_fileData, firstValidByteBlock, 'firstValidByteBlock')
-    _simple_elements(amd_fileData, formatLocation, 'formatLocation')
-    _simple_elements(amd_fileData, formatName, 'formatName')
-    _simple_elements(amd_fileData, formatNote, 'formatNote')
-    _simple_elements(amd_fileData, formatVersion, 'formatVersion')
-    _simple_elements(amd_fileData, lastValidByteBlock, 'lastValidByteBlock')
-    _simple_elements(amd_fileData, numSampleFrames, 'numSampleFrames')
-    _simple_elements(amd_fileData, samplingFrequency, 'samplingFrequency')
-    _simple_elements(amd_fileData, security, 'security')
-    _simple_elements(amd_fileData, use, 'use')
-    # if 'Other' in use_elements:
-    _simple_elements(amd_fileData, otherUse, 'otherUse')
-    _simple_elements(amd_fileData, wordSize, 'wordSize')
+    for key in params:
+        if key == "messageDigest" or key == "Compression":
+            _add_elements(element, params[key])
+        else:
+            _simple_elements(element, params[key], key)
 
-    return amd_fileData
+    return element
 
 
-def amd_messageDigest(messageDigestDatetime, messageDigestAlgorithm,
-                    messageDigest):
+def amd_message_digest(datetime, algorithm, message_digest):
     """Returns AudioMD messageDigest element
 
     :Schema documentation: https://www.loc.gov/standards/amdvmd/audiovideoMDschemas.html
@@ -204,23 +233,21 @@ def amd_messageDigest(messageDigestDatetime, messageDigestAlgorithm,
         </amd:messageDigest>
 
     """
-    amd_messageDigest = _element('messageDigest')
+    message_digest_elem = _element('messageDigest')
 
-    amd_messageDigestDatetime = _subelement(amd_messageDigest, 'messageDigestDatetime')
-    amd_messageDigestDatetime.text = messageDigestDatetime
+    datetime_elem = _subelement(message_digest_elem, 'messageDigestDatetime')
+    datetime_elem.text = datetime
 
-    amd_messageDigestAlgorithm = _subelement(amd_messageDigest, 'messageDigestAlgorithm')
-    amd_messageDigestAlgorithm.text = messageDigestAlgorithm
+    algorithm_elem = _subelement(message_digest_elem, 'messageDigestAlgorithm')
+    algorithm_elem.text = algorithm
 
-    amd_messageDigestValue = _subelement(amd_messageDigest, 'messageDigest')
-    amd_messageDigestValue.text = messageDigest
+    message_digest_value_elem = _subelement(message_digest_elem, 'messageDigest')
+    message_digest_value_elem.text = message_digest
+
+    return message_digest_elem
 
 
-    return amd_messageDigest
-
-
-def amd_compression(codecCreatorApp=None, codecCreatorAppVersion=None,
-                    codecName=None, codecQuality=None):
+def amd_compression(app=None, app_version=None, name=None, quality=None):
     """Returns AudioMD compression element
 
     :Schema documentation: https://www.loc.gov/standards/amdvmd/audiovideoMDschemas.html
@@ -235,24 +262,17 @@ def amd_compression(codecCreatorApp=None, codecCreatorAppVersion=None,
         </amd:compression>
 
     """
-    amd_compression = _element('compression')
+    compression_elem = _element('compression')
 
-    _one_simple_element(amd_compression, codecCreatorApp, 'codecCreatorApp')
-    _one_simple_element(amd_compression, codecCreatorAppVersion, 'codecCreatorAppVersion')
-    _one_simple_element(amd_compression, codecName, 'codecName')
-    _one_simple_element(amd_compression, codecQuality, 'codecQuality')
+    _simple_elements(compression_elem, app, 'codecCreatorApp')
+    _simple_elements(compression_elem, app_version, 'codecCreatorAppVersion')
+    _simple_elements(compression_elem, name, 'codecName')
+    _simple_elements(compression_elem, quality, 'codecQuality')
 
-    return amd_compression
+    return compression_elem
 
 
-def amd_physicalData(EBUStorageMediaCodes=None, condition=None,
-                     dimensions=None, disposition=None,
-                     equalization=None, generation=None,
-                     groove=None, material=None,
-                     noiseReduction=None, physFormat=None,
-                     speed=None, speedAdjustment=None,
-                     speedNote=None, trackFormat=None,
-                     tracking=None, note=None):
+def amd_physical_data(params):
     """Returns AudioMD physicalData element
 
     :Schema documentation: https://www.loc.gov/standards/amdvmd/audiovideoMDschemas.html
@@ -279,31 +299,20 @@ def amd_physicalData(EBUStorageMediaCodes=None, condition=None,
         </amd:physicalData>
 
     """
-    amd_physicalData = _element('physicalData')
+    _check_params(params, PHYSICAL_DATA_PARAMS)
 
-    _simple_elements(amd_physicalData, EBUStorageMediaCodes, 'EBUStorageMediaCodes')
-    _simple_elements(amd_physicalData, condition, 'condition')
-    _add_elements(amd_fileData, dimensions)
-    _simple_elements(amd_physicalData, disposition, 'disposition')
-    _simple_elements(amd_physicalData, equalization, 'equalization')
-    _simple_elements(amd_physicalData, generation, 'generation')
-    _simple_elements(amd_physicalData, groove, 'groove')
-    _add_elements(amd_fileData, material)
-    _simple_elements(amd_physicalData, noiseReduction, 'noiseReduction')
-    _simple_elements(amd_physicalData, physFormat, 'physFormat')
-    _simple_elements(amd_physicalData, speed, 'speed')
-    _simple_elements(amd_physicalData, speedAdjustment, 'speedAdjustment')
-    _simple_elements(amd_physicalData, speedNote, 'speedNote')
-    _simple_elements(amd_physicalData, trackFormat, 'trackFormat')
-    _add_elements(amd_fileData, tracking)
-    _simple_elements(amd_physicalData, note, 'note')
+    physical_data_elem = _element('physicalData')
 
-    return amd_physicalData
+    for key in params:
+        if key in ["dimensions", "material", "tracking"]:
+            _add_elements(physical_data_elem, params[key])
+        else:
+            _simple_elements(physical_data_elem, params[key], key)
+
+    return physical_data_elem
 
 
-def amd_dimensions(depth=None, diameter=None, gauge=None, height=None
-                   , length=None, note=None, thickness=None, units=None
-                   , width=None):
+def amd_dimensions(params):
     """Returns AudioMD dimensions element
 
     :Schema documentation: https://www.loc.gov/standards/amdvmd/audiovideoMDschemas.html
@@ -315,34 +324,18 @@ def amd_dimensions(depth=None, diameter=None, gauge=None, height=None
         </amd:dimensions>
 
     """
+    _check_params(params, DIMENSIONS_PARAMS)
 
-    amd_dimensions = _element('dimensions')
+    dimensions_elem = _element('dimensions')
 
-    if depth:
-        amd_dimensions.set('DEPTH', depth)
-    if diameter:
-        amd_dimensions.set('DIAMETER', diameter)
-    if gauge:
-        amd_dimensions.set('GAUGE', gauge)
-    if height:
-        amd_dimensions.set('HEIGHT', height)
-    if length:
-        amd_dimensions.set('LENGTH', length)
-    if note:
-        amd_dimensions.set('NOTE', note)
-    if thickness:
-        amd_dimensions.set('THICKNESS', thickness)
-    if units:
-        amd_dimensions.set('UNITS', units)
-    if width:
-        amd_dimensions.set('WIDTH', width)
+    for key in params:
+        if params[key] is not None:
+            dimensions_elem.set(key, params[key])
 
-    return amd_dimensions
+    return dimensions_elem
 
 
-def amd_material(baseMaterial=None, binder=None, discSurface=None, 
-                 oxide=None, activeLayer=None, reflectiveLayer=None, 
-                 stockBrand=None, method=None, usedSides=None):
+def amd_material(params):
     """Returns AudioMD material element
 
     :Schema documentation: https://www.loc.gov/standards/amdvmd/audiovideoMDschemas.html
@@ -360,24 +353,18 @@ def amd_material(baseMaterial=None, binder=None, discSurface=None,
             <amd:method></amd:method>
             <amd:usedSides></amd:usedSides>
         </amd:material>
-
     """
-    amd_material = _element('material')
+    _check_params(params, MATERIAL_PARAMS)
 
-    _one_simple_element(amd_material, baseMaterial, 'baseMaterial')
-    _one_simple_element(amd_material, binder, 'binder')
-    _one_simple_element(amd_material, discSurface, 'discSurface')
-    _one_simple_element(amd_material, oxide, 'oxide')
-    _one_simple_element(amd_material, activeLayer, 'activeLayer')
-    _one_simple_element(amd_material, reflectiveLayer, 'reflectiveLayer')
-    _one_simple_element(amd_material, stockBrand, 'stockBrand')
-    _one_simple_element(amd_material, method, 'method')
-    _one_simple_element(amd_material, usedSides, 'usedSides')
+    material_elem = _element('material')
 
-    return amd_material
+    for key in params:
+        _simple_elements(material_elem, params[key], key)
+
+    return material_elem
 
 
-def amd_tracking(trackingType=None, trackingValue=None):
+def amd_tracking(tracking_type=None, tracking_value=None):
     """Returns AudioMD tracking element
 
     :Schema documentation: https://www.loc.gov/standards/amdvmd/audiovideoMDschemas.html
@@ -390,16 +377,18 @@ def amd_tracking(trackingType=None, trackingValue=None):
         </amd:tracking>
 
     """
-    amd_tracking = _element('tracking')
+    tracking_elem = _element('tracking')
 
-    _one_simple_element(amd_tracking, trackingType, 'trackingType')
-    _one_simple_element(amd_tracking, trackingValue, 'trackingValue')
+    _simple_elements(tracking_elem, tracking_type, 'trackingType')
+    _simple_elements(tracking_elem, tracking_value, 'trackingValue')
 
-    return amd_tracking
+    return tracking_elem
 
 
-def amd_audioInfo(duration=None, note=None, numChannels=None,
-                  soundChannelMap=None, soundField=None):
+def amd_audio_info(
+        duration=None, note=None, num_channels=None,
+        sound_channel_map=None, sound_field=None
+):
     """Returns AudioMD audioInfo element
 
     :Schema documentation: https://www.loc.gov/standards/amdvmd/audiovideoMDschemas.html
@@ -415,18 +404,18 @@ def amd_audioInfo(duration=None, note=None, numChannels=None,
         </amd:audioInfo>
 
     """
-    amd_audioInfo = _element('audioInfo')
+    audio_info_elem = _element('audioInfo')
 
-    _simple_elements(amd_audioInfo, duration, 'duration')
-    _simple_elements(amd_audioInfo, note, 'note')
-    _simple_elements(amd_audioInfo, numChannels, 'numChannels')
-    _add_elements(amd_audioInfo, soundChannelMap)
-    _simple_elements(amd_audioInfo, soundField, 'soundField')
+    _simple_elements(audio_info_elem, duration, 'duration')
+    _simple_elements(audio_info_elem, note, 'note')
+    _simple_elements(audio_info_elem, num_channels, 'numChannels')
+    _add_elements(audio_info_elem, sound_channel_map)
+    _simple_elements(audio_info_elem, sound_field, 'soundField')
 
-    return amd_audioInfo
+    return audio_info_elem
 
 
-def amd_soundChannelMap(channelnum=None, maplocation=None):
+def amd_sound_channel_map(channelnum=None, maplocation=None):
     """Returns soundChannelMap dimensions element
 
     :Schema documentation: https://www.loc.gov/standards/amdvmd/audiovideoMDschemas.html
@@ -440,19 +429,24 @@ def amd_soundChannelMap(channelnum=None, maplocation=None):
 
     """
 
-    amd_soundChannelMap = _element('soundChannelMap')
-    amd_channelAssignment = _subelement(amd_soundChannelMap, 'channelAssignment')
+    sound_channel_map_elem = _element('soundChannelMap')
+    channel_assignment_elem = _subelement(
+        sound_channel_map_elem,
+        'channelAssignment'
+    )
 
-    if channelnum:
-        amd_channelAssignment.set('CHANNELNUM', channelnum)
-    if maplocation:
-        amd_channelAssignment.set('MAPLOCATION', maplocation)
+    if channelnum is not None:
+        channel_assignment_elem.set('CHANNELNUM', channelnum)
+    if maplocation is not None:
+        channel_assignment_elem.set('MAPLOCATION', maplocation)
 
-    return amd_soundChannelMap
+    return sound_channel_map_elem
 
 
-def amd_calibrationInfo(calibrationExtInt=None, calibrationLocation=None,
-                        calibrationTimeStamp=None, calibrationTrackType=None):
+def amd_calibration_info(
+        ext_int=None, location=None,
+        time_stamp=None, track_type=None
+):
     """Returns AudioMD calibrationInfo element
 
     :Schema documentation: https://www.loc.gov/standards/amdvmd/audiovideoMDschemas.html
@@ -465,13 +459,13 @@ def amd_calibrationInfo(calibrationExtInt=None, calibrationLocation=None,
             <amd:calibrationTimeStamp></amd:calibrationTimeStamp>
             <amd:calibrationTrackType></amd:calibrationTrackType>
         </amd:calibrationInfo>
-
     """
-    amd_calibrationInfo = _element('calibrationInfo')
 
-    _one_simple_element(amd_calibrationInfo, calibrationExtInt, 'calibrationExtInt')
-    _one_simple_element(amd_calibrationInfo, calibrationLocation, 'calibrationLocation')
-    _simple_elements(amd_audioInfo, calibrationTimeStamp, 'calibrationTimeStamp')
-    _one_simple_element(amd_calibrationInfo, calibrationTrackType, 'calibrationTrackType')
+    calibration_info_elem = _element('calibrationInfo')
 
-    return amd_calibrationInfo
+    _simple_elements(calibration_info_elem, ext_int, 'calibrationExtInt')
+    _simple_elements(calibration_info_elem, location, 'calibrationLocation')
+    _simple_elements(calibration_info_elem, time_stamp, 'calibrationTimeStamp')
+    _simple_elements(calibration_info_elem, track_type, 'calibrationTrackType')
+
+    return calibration_info_elem
