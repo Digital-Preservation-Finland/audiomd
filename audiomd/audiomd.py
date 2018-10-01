@@ -142,8 +142,8 @@ def _check_params(param_dict, param_list):
             raise ValueError("Parameter: '%s' not recognized" % key)
 
 
-def audiomd(analog_digital_flag='FileDigital', file_data=None,
-            physical_data=None, audio_info=None, calibration_info=None):
+def create_audiomd(analog_digital_flag='FileDigital', file_data=None,
+                   physical_data=None, audio_info=None, calibration_info=None):
     """Create audioMD Data Dictionary root element.
 
     :Schema documentation: https://www.loc.gov/standards/amdvmd/audiovideoMDschemas.html

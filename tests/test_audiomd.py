@@ -2,7 +2,7 @@
 """
 
 import pytest
-import audiomd.audiomd as amd
+import audiomd as amd
 
 NAMESPACES = {'amd': amd.AUDIOMD_NS}
 
@@ -12,8 +12,8 @@ def _get_elems(root, path):
 
 
 def test_audiomd():
-    """Test that audiomd() functions returns the root XML elements with
-    correct metadata.
+    """Test that create_audiomd() functions returns the
+    root XML elements with correct metadata.
     """
 
     compression = amd.amd_compression(app='SoundForge',
@@ -31,7 +31,7 @@ def test_audiomd():
 
     file_data = amd.amd_file_data(params)
     audio_info = amd.amd_audio_info(duration=['PT1H30M'], num_channels=['1'])
-    audiomd = amd.audiomd(file_data=file_data, audio_info=audio_info)
+    audiomd = amd.create_audiomd(file_data=file_data, audio_info=audio_info)
 
     path = "/amd:amd[@ANALOGDIGITALFLAG='FileDigital']"
     assert len(audiomd.xpath(path, namespaces=NAMESPACES)) == 1
