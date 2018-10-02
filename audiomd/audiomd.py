@@ -470,12 +470,3 @@ def amd_calibration_info(
     _simple_elements(calibration_info_elem, track_type, 'calibrationTrackType')
 
     return calibration_info_elem
-
-if __name__ == "__main__":
-    audiomd = create_audiomd(
-        file_data=amd_file_data(
-            {"audioDataEncoding" : "PCM"}
-        )
-    )
-
-    print ET.tostring(audiomd, pretty_print=True)
