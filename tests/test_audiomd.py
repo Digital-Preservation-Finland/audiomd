@@ -26,7 +26,7 @@ def test_audiomd():
     params = amd.get_params(amd.FILE_DATA_PARAMS)
     params["audioDataEncoding"] = "PCM"
     params["bitsPerSample"] = "8"
-    params["Compression"] = compression
+    params["compression"] = compression
     params["dataRate"] = "256"
     params["dataRateMode"] = "Fixed"
     params["samplingFrequency"] = "44.1"

@@ -20,7 +20,7 @@ NAMESPACE = {"amd" : AUDIOMD_NS}
 
 FILE_DATA_PARAMS = [
     "audioBlockSize", "audioDataEncoding", "bitsPerSample",
-    "byteOrder", "messageDigest", "Compression",
+    "byteOrder", "messageDigest", "compression",
     "dataRate", "dataRateMode", "firstSampleOffset",
     "firstValidByteBlock", "formatLocation", "formatName",
     "formatNote", "formatVersion", "lastValidByteBlock",
@@ -188,7 +188,7 @@ def amd_file_data(params):
             <amd:bitsPerSample></amd:bitsPerSample>
             <amd:byteOrder></amd:byteOrder>
             {{ messageDigest elements }}
-            {{ Compression elements }}
+            {{ compression elements }}
             <amd:dataRate></amd:dataRate>
             <amd:dataRateMode></amd:dataRateMode>
             <amd:firstSampleOffset></amd:firstSampleOffset>
@@ -212,7 +212,7 @@ def amd_file_data(params):
     element = _element('fileData')
 
     for key in params:
-        if key == "messageDigest" or key == "Compression":
+        if key == "messageDigest" or key == "compression":
             _add_elements(element, params[key])
         else:
             _simple_elements(element, params[key], key)
