@@ -16,6 +16,7 @@ from xml_helpers.utils import xsi_ns
 
 
 AUDIOMD_NS = 'http://www.loc.gov/audioMD/'
+NAMESPACE = {"amd" : AUDIOMD_NS}
 
 FILE_DATA_PARAMS = [
     "audioBlockSize", "audioDataEncoding", "bitsPerSample",
@@ -81,7 +82,7 @@ def _element(tag, prefix=""):
     :returns: ElementTree element object
 
     """
-    return ET.Element(audiomd_ns(tag, prefix))
+    return ET.Element(audiomd_ns(tag, prefix), nsmap=NAMESPACE)
 
 
 def _subelement(parent, tag, prefix=""):
@@ -469,3 +470,12 @@ def amd_calibration_info(
     _simple_elements(calibration_info_elem, track_type, 'calibrationTrackType')
 
     return calibration_info_elem
+
+if __name__ == "__main__":
+    audiomd = create_audiomd(
+        file_data=amd_file_data(
+            {"audioDataEncoding" : "PCM"}
+        )
+    )
+
+    print ET.tostring(audiomd, pretty_print=True)

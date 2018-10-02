@@ -16,10 +16,12 @@ def test_audiomd():
     root XML elements with correct metadata.
     """
 
-    compression = amd.amd_compression(app='SoundForge',
-                                      app_version='10',
-                                      name='(:unap)',
-                                      quality='lossy')
+    compression = amd.amd_compression(
+        app='(:unap)',
+        app_version='(:unap)',
+        name='(:unap)',
+        quality='lossless'
+    )
 
     params = amd.get_params(amd.FILE_DATA_PARAMS)
     params["audioDataEncoding"] = "PCM"
@@ -43,16 +45,16 @@ def test_audiomd():
     assert audiomd.xpath(path, namespaces=NAMESPACES)[0].text == '8'
 
     path = "/amd:amd/amd:fileData/amd:compression/amd:codecCreatorApp"
-    assert audiomd.xpath(path, namespaces=NAMESPACES)[0].text == 'SoundForge'
+    assert audiomd.xpath(path, namespaces=NAMESPACES)[0].text == '(:unap)'
 
     path = "/amd:amd/amd:fileData/amd:compression/amd:codecCreatorAppVersion"
-    assert audiomd.xpath(path, namespaces=NAMESPACES)[0].text == '10'
+    assert audiomd.xpath(path, namespaces=NAMESPACES)[0].text == '(:unap)'
 
     path = "/amd:amd/amd:fileData/amd:compression/amd:codecName"
     assert audiomd.xpath(path, namespaces=NAMESPACES)[0].text == '(:unap)'
 
     path = "/amd:amd/amd:fileData/amd:compression/amd:codecQuality"
-    assert audiomd.xpath(path, namespaces=NAMESPACES)[0].text == 'lossy'
+    assert audiomd.xpath(path, namespaces=NAMESPACES)[0].text == 'lossless'
 
     path = "/amd:amd/amd:fileData/amd:dataRate"
     assert audiomd.xpath(path, namespaces=NAMESPACES)[0].text == '256'
