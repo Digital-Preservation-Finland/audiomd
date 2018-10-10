@@ -12,7 +12,6 @@ References:
 
 
 import lxml.etree as ET
-from xml_helpers.utils import xsi_ns
 
 
 AUDIOMD_NS = 'http://www.loc.gov/audioMD/'
@@ -155,12 +154,9 @@ def create_audiomd(analog_digital_flag='FileDigital', file_data=None,
 
         <amd:AUDIOMD
             xmlns:amd="http://www.loc.gov/audioMD/"
-            xmlns:xsi="http://www.w3.org/2001/xmlschema-instance"
-            xsi:schemalocation="http://www.loc.gov/audioMD/"
-
+            
     """
-    audiomd_elem = _element('amd')
-    audiomd_elem.set(xsi_ns('schemaLocation'), 'http://www.loc.gov/audioMD/')
+    audiomd_elem = _element('AUDIOMD')
     audiomd_elem.set('ANALOGDIGITALFLAG', analog_digital_flag)
 
     if file_data is not None:
