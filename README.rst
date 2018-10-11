@@ -17,7 +17,7 @@ Usage
 
 Import the library with::
 
-    import audiomd.audiomd as amd
+    import audiomd as amd
 
 Please, see the AudioMD documentation for more information:
 https://www.loc.gov/standards/amdvmd/
