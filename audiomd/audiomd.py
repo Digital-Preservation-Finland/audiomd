@@ -12,11 +12,11 @@ References:
 
 
 import lxml.etree as ET
-from xml_helpers.utils import xsi_ns
+from xml_helpers.utils import xsi_ns, XSI_NS
 
 
 AUDIOMD_NS = 'http://www.loc.gov/audioMD/'
-NAMESPACE = {"amd" : AUDIOMD_NS}
+NAMESPACE = {"amd" : AUDIOMD_NS, "xsi" : XSI_NS}
 
 FILE_DATA_PARAMS = [
     "audioBlockSize", "audioDataEncoding", "bitsPerSample",
@@ -158,7 +158,7 @@ def create_audiomd(analog_digital_flag='FileDigital', file_data=None,
 
     """
     audiomd_elem = _element('AUDIOMD')
-    audiomd_elem.set(xsi_ns('schemaLocation'), 'http://www.loc.gov/audioMD/')
+    audiomd_elem.set(xsi_ns('schemaLocation'), 'https://www.loc.gov/standards/amdvmd/audioMD.xsd')
     audiomd_elem.set('ANALOGDIGITALFLAG', analog_digital_flag)
 
     if file_data is not None:
