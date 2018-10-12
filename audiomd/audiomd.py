@@ -158,7 +158,11 @@ def create_audiomd(analog_digital_flag='FileDigital', file_data=None,
 
     """
     audiomd_elem = _element('AUDIOMD')
-    audiomd_elem.set(xsi_ns('schemaLocation'), 'https://www.loc.gov/standards/amdvmd/audioMD.xsd')
+    audiomd_elem.set(
+        xsi_ns('schemaLocation'),
+        'http://www.loc.gov/audioMD/ ' +
+        'https://www.loc.gov/standards/amdvmd/audioMD.xsd'
+    )
     audiomd_elem.set('ANALOGDIGITALFLAG', analog_digital_flag)
 
     if file_data is not None:
