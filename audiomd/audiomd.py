@@ -213,7 +213,7 @@ def amd_file_data(params):
 
     element = _element('fileData')
 
-    for key in params:
+    for key in FILE_DATA_PARAMS:
         if key == "messageDigest" or key == "compression":
             _add_elements(element, params[key])
         else:
@@ -306,7 +306,7 @@ def amd_physical_data(params):
 
     physical_data_elem = _element('physicalData')
 
-    for key in params:
+    for key in PHYSICAL_DATA_PARAMS:
         if key in ["dimensions", "material", "tracking"]:
             _add_elements(physical_data_elem, params[key])
         else:
@@ -331,7 +331,7 @@ def amd_dimensions(params):
 
     dimensions_elem = _element('dimensions')
 
-    for key in params:
+    for key in DIMENSIONS_PARAMS:
         if params[key] is not None:
             dimensions_elem.set(key, params[key])
 
@@ -361,7 +361,7 @@ def amd_material(params):
 
     material_elem = _element('material')
 
-    for key in params:
+    for key in MATERIAL_PARAMS:
         _simple_elements(material_elem, params[key], key)
 
     return material_elem
