@@ -2,8 +2,8 @@
 """
 
 import pytest
-import audiomd as amd
 import lxml.etree as ET
+import audiomd as amd
 
 
 NAMESPACES = {'amd': amd.AUDIOMD_NS}
@@ -152,9 +152,7 @@ def test_physical_data():
 def test_dimensions():
     """Test that amd_dimensions() produces correct XML element
     """
-    params = amd.get_params(amd.DIMENSIONS_PARAMS)
-    params["DEPTH"] = "DEPTH"
-    params["DIAMETER"] = "DIAMETER"
+    params = {"DEPTH" : "DEPTH", "DIAMETER" : "DIAMETER"}
 
     root = amd.amd_dimensions(params)
 
