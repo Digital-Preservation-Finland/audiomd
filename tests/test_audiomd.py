@@ -2,10 +2,12 @@
 """
 
 import pytest
+import lxml.etree as ET
 import audiomd as amd
 
 
 NAMESPACES = {'amd': amd.AUDIOMD_NS}
+SCHEMA = ET.XMLSchema(ET.parse("tests/schemas/audioMD.xsd"))
 
 
 def _get_elems(root, path):
@@ -35,6 +37,8 @@ def test_audiomd():
     file_data = amd.amd_file_data(params)
     audio_info = amd.amd_audio_info(duration=['PT1H30M'], num_channels=['1'])
     audiomd = amd.create_audiomd(file_data=file_data, audio_info=audio_info)
+
+    assert SCHEMA.validate(audiomd)
 
     path = "/amd:AUDIOMD[@ANALOGDIGITALFLAG='FileDigital']"
     assert len(audiomd.xpath(path, namespaces=NAMESPACES)) == 1
