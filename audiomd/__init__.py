@@ -1,1 +1,1 @@
-from audiomd import *
+from .audiomd import *

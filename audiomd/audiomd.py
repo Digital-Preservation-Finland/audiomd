@@ -16,7 +16,7 @@ from xml_helpers.utils import xsi_ns, XSI_NS
 
 
 AUDIOMD_NS = 'http://www.loc.gov/audioMD/'
-NAMESPACE = {"amd" : AUDIOMD_NS, "xsi" : XSI_NS}
+NAMESPACE = {"amd": AUDIOMD_NS, "xsi": XSI_NS}
 
 FILE_DATA_PARAMS = [
     "audioBlockSize", "audioDataEncoding", "bitsPerSample",
@@ -245,7 +245,8 @@ def amd_message_digest(datetime, algorithm, message_digest):
     algorithm_elem = _subelement(message_digest_elem, 'messageDigestAlgorithm')
     algorithm_elem.text = algorithm
 
-    message_digest_value_elem = _subelement(message_digest_elem, 'messageDigest')
+    message_digest_value_elem = _subelement(
+        message_digest_elem, 'messageDigest')
     message_digest_value_elem.text = message_digest
 
     return message_digest_elem
