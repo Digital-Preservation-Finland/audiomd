@@ -82,7 +82,7 @@ def test_audiomd_param_fail():
     parameters is not recognized.
     """
 
-    params = {"typo" : None}
+    params = {"typo": None}
 
     with pytest.raises(ValueError):
         amd.amd_file_data(params)
