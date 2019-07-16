@@ -1,5 +1,6 @@
 """Unit tests for creation of AudioMD metadata.
 """
+from __future__ import unicode_literals
 
 import pytest
 import lxml.etree as ET
@@ -52,7 +53,8 @@ def test_audiomd():
     path = "/amd:AUDIOMD/amd:fileData/amd:compression/amd:codecCreatorApp"
     assert audiomd.xpath(path, namespaces=NAMESPACES)[0].text == '(:unap)'
 
-    path = "/amd:AUDIOMD/amd:fileData/amd:compression/amd:codecCreatorAppVersion"
+    path = \
+        "/amd:AUDIOMD/amd:fileData/amd:compression/amd:codecCreatorAppVersion"
     assert audiomd.xpath(path, namespaces=NAMESPACES)[0].text == '(:unap)'
 
     path = "/amd:AUDIOMD/amd:fileData/amd:compression/amd:codecName"
@@ -152,7 +154,7 @@ def test_physical_data():
 def test_dimensions():
     """Test that amd_dimensions() produces correct XML element
     """
-    params = {"DEPTH" : "DEPTH", "DIAMETER" : "DIAMETER"}
+    params = {"DEPTH": "DEPTH", "DIAMETER": "DIAMETER"}
 
     root = amd.amd_dimensions(params)
 
