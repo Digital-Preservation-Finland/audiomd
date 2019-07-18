@@ -9,7 +9,7 @@ References:
     https://docs.python.org/2.6/library/xml.etree.elementtree.html
 
 """
-
+from __future__ import unicode_literals
 
 import lxml.etree as ET
 from xml_helpers.utils import xsi_ns, XSI_NS
