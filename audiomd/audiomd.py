@@ -1,3 +1,4 @@
+# flake8: noqa
 """Functions for reading and generating AudioMD Data Dictionaries as
 xml.etree.ElementTree data structures.
 
