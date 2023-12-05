@@ -10,7 +10,6 @@ References:
     https://docs.python.org/2.6/library/xml.etree.elementtree.html
 
 """
-from __future__ import unicode_literals
 
 import lxml.etree as ET
 from xml_helpers.utils import xsi_ns, XSI_NS
@@ -64,8 +63,8 @@ def audiomd_ns(tag, prefix=""):
     """
     if prefix:
         tag = tag[0].upper() + tag[1:]
-        return '{%s}%s%s' % (AUDIOMD_NS, prefix, tag)
-    return '{%s}%s' % (AUDIOMD_NS, tag)
+        return '{{{}}}{}{}'.format(AUDIOMD_NS, prefix, tag)
+    return '{{{}}}{}'.format(AUDIOMD_NS, tag)
 
 
 def _element(tag, prefix=""):
