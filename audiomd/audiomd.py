@@ -63,8 +63,8 @@ def audiomd_ns(tag, prefix=""):
     """
     if prefix:
         tag = tag[0].upper() + tag[1:]
-        return '{{{}}}{}{}'.format(AUDIOMD_NS, prefix, tag)
-    return '{{{}}}{}'.format(AUDIOMD_NS, tag)
+        return f'{{{AUDIOMD_NS}}}{prefix}{tag}'
+    return f'{{{AUDIOMD_NS}}}{tag}'
 
 
 def _element(tag, prefix=""):
